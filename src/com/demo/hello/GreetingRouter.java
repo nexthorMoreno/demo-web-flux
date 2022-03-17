@@ -20,9 +20,10 @@ public class GreetingRouter {
 	public RouterFunction<ServerResponse> route(GreetingHandler greetingHandler) {
 
 		return RouterFunctions
-			.route(GET("/asyncapi/service").and(accept(MediaType.APPLICATION_JSON)), greetingHandler::hello1)
-			.andRoute(GET("/hello").and(accept(MediaType.APPLICATION_JSON)), greetingHandler::hello)
+			/*.route(GET("/asyncapi/service").and(accept(MediaType.APPLICATION_JSON)), greetingHandler::hello1)
+			.andRoute(GET("/hello").and(accept(MediaType.APPLICATION_OCTET_STREAM)), greetingHandler::hello)
 				.andRoute(GET("/hello2/{name}").and(accept(MediaType.APPLICATION_JSON)), greetingHandler::hello2)
-			.andRoute(GET("/hello3").and(accept(MediaType.APPLICATION_JSON)), greetingHandler::hello3);
+			.andRoute(GET("/hello3").and(accept(MediaType.APPLICATION_JSON)), greetingHandler::hello3)*/
+			.route(GET("/hello5").and(accept(MediaType.APPLICATION_JSON)), greetingHandler::hello5);
 	}
 }

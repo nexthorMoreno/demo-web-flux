@@ -22,7 +22,15 @@ public class GreetingClient {
 		return this.client.get().uri("/hello").accept(MediaType.APPLICATION_JSON)
 				.retrieve()
 				.bodyToMono(JSONObject.class);
-
 	}
+
+	public String getMessage1() {
+		return this.client.get().uri("/hello").accept(MediaType.APPLICATION_JSON)
+				.retrieve()
+				.bodyToMono(String.class)
+				.block();
+	}
+
+
 
 }

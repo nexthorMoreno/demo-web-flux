@@ -1,10 +1,12 @@
 package com.demo.hello;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.reactivestreams.Publisher;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
+import org.springframework.web.reactive.function.BodyExtractors;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
@@ -22,15 +24,40 @@ public class GreetingHandler {
 	@Autowired
 	private GreetingClient webClient;
 
-	public Mono<ServerResponse> hello(ServerRequest request) {
-		webClient.getMessage();
+	public Mono<ServerResponse> hello5(ServerRequest request) {
+		//prints request data
+/*		request.bodyToMono(String.class)
+				.subscribe(item -> System.out.println("Body" + item));*/
 
-		System.out.println(request.bodyToMono(JSONObject.class).toString());
+		Mono<JSONObject> reqJSONObject = getReqJSONObject(request);
+		printJObj(reqJSONObject);
 
-		System.out.println("MESSAGE: " + webClient.getMessage());
 
+		return Mono.empty();
+
+		/* //prints without changes
 		return ServerResponse.ok().contentType(MediaType.APPLICATION_JSON)
-				.body(BodyInserters.fromValue(new String("{\"name\":\"Hello\"}"))) ;
+				.body(BodyInserters.fromDataBuffers(dataBuffer));
+*/
+
+/*		return ServerResponse.ok()
+				.contentType(MediaType.APPLICATION_JSON)
+				.body(BodyInserters.fromDataBuffers(request
+						.body(BodyExtractors.toDataBuffers())));*/
+	}
+
+	private Mono<JSONObject> getReqJSONObject(ServerRequest request) throws JSONException {
+		Mono<String>  body = request.bodyToMono(String.class);
+		return body.map(item -> new JSONObject(item));
+	}
+
+	public void printJObj(Mono<JSONObject> jsonObjectMono) {
+		jsonObjectMono.subscribe(item -> System.out.println(item));
+	}
+
+	public Mono<ServerResponse> hello(ServerRequest request) {
+		return ServerResponse.ok().contentType(MediaType.APPLICATION_JSON)
+				.body(BodyInserters.fromDataBuffers(request.body(BodyExtractors.toDataBuffers())));
 	}
 
 
@@ -38,7 +65,6 @@ public class GreetingHandler {
 		return ServerResponse.ok().contentType(MediaType.APPLICATION_JSON)
 				.body(BodyInserters.fromValue(new String("{\"name\":\"Hello\"}"))) ;
 	}
-
 
 	public Mono<ServerResponse> hello2(ServerRequest request) {
 		String name = request.pathVariable("name");
@@ -80,4 +106,19 @@ public class GreetingHandler {
 				.contentType(MediaType.APPLICATION_JSON_UTF8)
 				.body(profiles, String.class);
 	}
+
+
+/*	Mono<Void> fileWritten = WebClient.create().post()
+			.uri(uriBuilder -> uriBuilder.path("/file/").build())
+			.exchange()
+			.flatMap(response -> {
+				if (MediaType.APPLICATION_JSON_UTF8.equals(response.headers().contentType().get())) {
+					Mono<NoPayloadResponseDto> dto = response.bodyToMono(NoPayloadResponseDto.class);
+					return createErrorFile(dto);
+				}
+				else {
+					Flux<DataBuffer> body = response.bodyToFlux(DataBuffer.class);
+					return createSpreadsheet(body);
+				}
+			});*/
 }
